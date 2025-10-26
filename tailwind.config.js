@@ -7,17 +7,29 @@ module.exports = {
       colors: {
         text: {
           light: "#0d100b",
-          dark: "#f7fee7",
+          dark: "#FAFFF0",
         },
-        background: {
-          light: "#f7fee7",
+        bg: {
+          light: "#FAFFF0",
           dark: "#0d100b",
         },
         subtle: "#a3a3a3",
         muted: "#404040",
-        highlight: {
+        main: {
           light: "#bef264",
           dark: "#4d7c0f",
+        },
+        weak: {
+          light: "#E0EBCA",
+          dark: "#404040",
+        },
+        medium: {
+          light: "",
+          dark: "",
+        },
+        strong: {
+          light: "",
+          dark: "",
         }
       },
     },

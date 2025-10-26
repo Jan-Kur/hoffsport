@@ -1,6 +1,6 @@
 import { Text, TouchableOpacity, View } from "react-native";
 
-export default function YourTeam() {
+export default function Profile() {
   return (
     <View className="bg-background-light dark:bg-background-dark justify-center items-center">
       <View className="bg-subtle w-1/2 h-1/5 justify-center items-center">
