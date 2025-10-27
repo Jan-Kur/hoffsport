@@ -1,5 +1,6 @@
 import { Stack } from "expo-router"
-import { AuthProvider } from "../contexts/authContext"
+import { useContext } from "react"
+import { AuthContext, AuthProvider } from "../contexts/authContext"
 import "../global.css"
 
 export default function RootLayout() {
@@ -11,16 +12,18 @@ export default function RootLayout() {
 }
 
 function RootNavigator() {
-  let user = ""
+  const {user, loading} = useContext(AuthContext)
 
-  return (
-    <Stack>
-      <Stack.Protected guard={!!user}>
-        <Stack.Screen name="(tabs)" options={{headerShown: false}}/>
-      </Stack.Protected>
-      <Stack.Protected guard={!user}>
-        <Stack.Screen name="(auth)" options={{headerShown: false}}/>
-      </Stack.Protected>
-    </Stack>
-  )
+  if (!loading) {
+    return (
+      <Stack>
+        <Stack.Protected guard={!!user}>
+          <Stack.Screen name="(tabs)" options={{headerShown: false}}/>
+        </Stack.Protected>
+        <Stack.Protected guard={!user}>
+          <Stack.Screen name="(auth)" options={{headerShown: false}}/>
+        </Stack.Protected>
+      </Stack>
+    )
+  }
 }

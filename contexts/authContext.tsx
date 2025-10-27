@@ -5,7 +5,7 @@ import { supabase } from "../supabase";
 type AuthContextType = {
   user: User | null
   loading: boolean
-  signUp: (email: string, password: string, fullName: string, grade: string) => Promise<{data: any, authError: any, profileError: any}>
+  signUp: (email: string, password: string) => Promise<{data: object, error: any}>
   signInWithEmail: (email: string, password: string) => Promise<{ error: any }>
   signOut: () => Promise<{ error: any }>
 }
@@ -13,7 +13,7 @@ type AuthContextType = {
 export const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: false,
-  signUp: async () => ({data: null, authError: null, profileError: null}),
+  signUp: async () => ({data: null, error: null}),
   signInWithEmail: async () => ({error: null}),
   signOut: async () => ({error: null}),
 })
@@ -37,10 +37,20 @@ export const AuthProvider = ({children}) => {
     }
   }, [])
 
-  const signUp = async (email: string, password: string, fullName: string, grade: string) => {
-    let { data, error: authError } = await supabase.auth.signUp({email, password})
-    let { error: profileError } = await supabase.from('profiles').insert({ id: data.user.id, full_name: fullName, email: email, class: grade })
-    return { data, authError, profileError }
+  const signUp = async (email: string, password: string) => {
+    let { data, error } = await supabase.auth.signUp({email, password})
+
+    if (!error && data.user) {
+      const {error: profileError} = await supabase
+      .from('profiles')
+      .insert({ id: data.user.id, email: email})
+
+      if (profileError) {
+        return { data, error: profileError }
+      }
+    }
+    
+    return { data, error }
   }
 
   const signInWithEmail = async (email: string, password: string) => {

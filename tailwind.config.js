@@ -17,7 +17,7 @@ module.exports = {
         muted: "#404040",
         main: {
           light: "#bef264",
-          dark: "#4d7c0f",
+          dark: "#A3E635",
         },
         weak: {
           light: "#E0EBCA",

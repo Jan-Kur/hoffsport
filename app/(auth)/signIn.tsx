@@ -1,3 +1,4 @@
+import { Link } from "expo-router";
 import { useContext, useState } from "react";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -9,17 +10,15 @@ export default function SignIn() {
   const [showPassword, setShowPassword] = useState(false)
   const [errorMessage, setErrorMessage] = useState("")
 
-  const {signInWithEmail, loading, user} = useContext(AuthContext)
+  const {signInWithEmail} = useContext(AuthContext)
 
   return (
     <SafeAreaView className="bg-bg-light dark:bg-bg-dark flex-1 px-5 pt-5">
-      {/*<TouchableOpacity className="bg-transparent w-full border-2 border-weak-light dark:border-weak-dark py-2">
-      </TouchableOpacity>*/}
       <View className="flex-col gap-3">
-        <View className="flex-col items-start gap-2">
+        <View className="flex-col items-start gap-1">
           <Text className="text-weak-dark dark:text-subtle text-lg font-semibold">Email szkolny</Text>
           <TextInput
-          className="bg-transparent rounded-xl border-2 border-weak-light dark:border-weak-dark text-weak-dark dark:text-subtle text-lg font-semibold p-2 w-full"
+          className="bg-transparent rounded-xl border-2 border-weak-light dark:border-weak-dark text-weak-dark dark:text-subtle text-lg font-semibold p-3 w-full"
           value={email}
           onChangeText={setEmail}
           placeholder="Wpisz swój email"
@@ -29,11 +28,11 @@ export default function SignIn() {
           autoCorrect={false}
           />
         </View>
-        <View className="flex-col items-start gap-2 ">
+        <View className="flex-col items-start gap-1 ">
           <Text className="text-weak-dark dark:text-subtle text-lg font-semibold">Hasło</Text>
           <View className="relative w-full h-fit">
             <TextInput
-            className="bg-transparent rounded-xl border-2 border-weak-light dark:border-weak-dark text-weak-dark dark:text-subtle text-lg font-semibold p-2 w-full"
+            className="bg-transparent rounded-xl border-2 border-weak-light dark:border-weak-dark text-weak-dark dark:text-subtle text-lg font-semibold p-3 w-full"
             value={password}
             onChangeText={setPassword}
             placeholder="Wpisz hasło"
@@ -44,7 +43,7 @@ export default function SignIn() {
             textContentType="password"
             autoComplete="current-password"
             />
-            <TouchableOpacity className="absolute top-[9px] right-3" onPress={() => setShowPassword(!showPassword)}>
+            <TouchableOpacity className="absolute top-[12px] right-3" onPress={() => setShowPassword(!showPassword)}>
               <Text className="text-lg">{showPassword ? '👀' : '🙈'}</Text>
             </TouchableOpacity>
           </View>
@@ -57,11 +56,14 @@ export default function SignIn() {
             setErrorMessage(error.message)
           }
         }}
-        className="bg-main-light w-full py-2 rounded-xl mt-2"
-        
+        className="bg-main-light w-full py-2 rounded-xl mt-3"
         >
-          <Text className="text-xl text-weak-dark text-center font-bold">Zaloguj się</Text>
+          <Text className="text-2xl text-weak-dark text-center font-bold">Zaloguj się</Text>
         </TouchableOpacity>
+        <View className="flex-row gap-1 self-center">
+          <Text className="text-base text-weak-dark dark:text-subtle font-semibold">Nie masz jeszcze konta?</Text>
+          <Link href={"/(auth)/register"} className="text-base text-main-dark dark:text-main-light font-semibold">Zarejestruj się</Link>
+        </View>
         <Text className="mt-4 text-base text-red-400">{errorMessage}</Text>
       </View>
     </SafeAreaView>
