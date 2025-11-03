@@ -5,32 +5,23 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        text: {
-          light: "#0d100b",
-          dark: "#FAFFF0",
+        light: "hsl(188, 5%, 95%)",
+        dark: "hsl(188, 10% 5%)",
+        gray: {
+          1: "hsl(188, 3%, 90%)",
+          2: "hsl(188, 3%, 83%)",
+          3: "hsl(188, 3%, 75%)",
+          4: "hsl(188, 3%, 60%)",
+          5: "hsl(188, 3%, 40%)",
+          6: "hsl(188, 3%, 20%)",
+          7: "hsl(188, 3%, 15%)",
+          8: "hsl(188, 3%, 10%)",
         },
-        bg: {
-          light: "#FAFFF0",
-          dark: "#0d100b",
-        },
-        subtle: "#a3a3a3",
-        muted: "#404040",
         main: {
-          light: "#bef264",
-          dark: "#A3E635",
+          DEFAULT: "hsl(188, 90%, 20%)",
+          light: "hsl(188, 90%, 30%)",
         },
-        weak: {
-          light: "#E0EBCA",
-          dark: "#404040",
-        },
-        medium: {
-          light: "",
-          dark: "",
-        },
-        strong: {
-          light: "",
-          dark: "",
-        }
+        error: "hsl(350, 55%, 50%)"
       },
     },
   },
