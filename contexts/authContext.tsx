@@ -39,16 +39,6 @@ export const AuthProvider = ({children}) => {
 
   const signUp = async (email: string, password: string) => {
     let { data, error } = await supabase.auth.signUp({email, password})
-
-    if (!error && data.user) {
-      const {error: profileError} = await supabase
-      .from('profiles')
-      .insert({ id: data.user.id, email: email})
-
-      if (profileError) {
-        return { data, error: profileError }
-      }
-    }
     
     return { data, error }
   }
