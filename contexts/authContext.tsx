@@ -1,20 +1,22 @@
-import { User } from "@supabase/supabase-js";
+import { AuthError, User } from "@supabase/supabase-js";
+import { makeRedirectUri } from 'expo-auth-session';
+import * as QueryParams from "expo-auth-session/build/QueryParams";
 import { createContext, useEffect, useState } from "react";
 import { supabase } from "../supabase";
 
 type AuthContextType = {
   user: User | null
   loading: boolean
-  signUp: (email: string, password: string) => Promise<{data: object, error: any}>
-  signInWithEmail: (email: string, password: string) => Promise<{ error: any }>
-  signOut: () => Promise<{ error: any }>
+  createSessionFromUrl: (url: string) => Promise<any | AuthError | null>
+  sendMagicLink: (email: string) => Promise<{error: AuthError | null}>
+  signOut: () => Promise<{ error: AuthError }>
 }
 
 export const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: false,
-  signUp: async () => ({data: null, error: null}),
-  signInWithEmail: async () => ({error: null}),
+  createSessionFromUrl: async (_url: string) => ({ error: null}),
+  sendMagicLink: async (_email: string) => ({ error: null}),
   signOut: async () => ({error: null}),
 })
 
@@ -37,14 +39,31 @@ export const AuthProvider = ({children}) => {
     }
   }, [])
 
-  const signUp = async (email: string, password: string) => {
-    let { data, error } = await supabase.auth.signUp({email, password})
-    
-    return { data, error }
-  }
+  const createSessionFromUrl = async (url: string) => {
+    const { params, errorCode } = QueryParams.getQueryParams(url);
 
-  const signInWithEmail = async (email: string, password: string) => {
-    let { data, error } = await supabase.auth.signInWithPassword({email, password})
+    if (errorCode) throw new Error(errorCode);
+    const { access_token, refresh_token } = params;
+
+    if (!access_token) return;
+    const { data, error } = await supabase.auth.setSession({
+      access_token,
+      refresh_token,
+    });
+
+    if (error) throw error;
+    return data.session;
+  };
+
+  const sendMagicLink = async (email: string) => {
+    const redirectTo = makeRedirectUri()
+
+    const { error } = await supabase.auth.signInWithOtp({
+      email: email,
+      options: {
+        emailRedirectTo: redirectTo,
+      },
+    })
 
     return { error }
   }
@@ -56,7 +75,7 @@ export const AuthProvider = ({children}) => {
   }
 
   return (
-    <AuthContext.Provider value={{user, loading, signUp, signInWithEmail, signOut}}>
+    <AuthContext.Provider value={{user, loading, createSessionFromUrl, sendMagicLink, signOut}}>
       {children}
     </AuthContext.Provider>
   )
