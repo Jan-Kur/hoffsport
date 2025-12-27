@@ -1,13 +1,11 @@
 import { AuthError, User } from "@supabase/supabase-js";
 import { makeRedirectUri } from 'expo-auth-session';
-import * as QueryParams from "expo-auth-session/build/QueryParams";
 import { createContext, useEffect, useState } from "react";
 import { supabase } from "../supabase";
 
 type AuthContextType = {
   user: User | null
   loading: boolean
-  createSessionFromUrl: (url: string) => Promise<any | AuthError | null>
   sendMagicLink: (email: string) => Promise<{error: AuthError | null}>
   signOut: () => Promise<{ error: AuthError }>
 }
@@ -15,7 +13,6 @@ type AuthContextType = {
 export const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: false,
-  createSessionFromUrl: async (_url: string) => ({ error: null}),
   sendMagicLink: async (_email: string) => ({ error: null}),
   signOut: async () => ({error: null}),
 })
@@ -39,24 +36,10 @@ export const AuthProvider = ({children}) => {
     }
   }, [])
 
-  const createSessionFromUrl = async (url: string) => {
-    const { params, errorCode } = QueryParams.getQueryParams(url);
-
-    if (errorCode) throw new Error(errorCode);
-    const { access_token, refresh_token } = params;
-
-    if (!access_token) return;
-    const { data, error } = await supabase.auth.setSession({
-      access_token,
-      refresh_token,
-    });
-
-    if (error) throw error;
-    return data.session;
-  };
-
   const sendMagicLink = async (email: string) => {
-    const redirectTo = makeRedirectUri()
+    const redirectTo = makeRedirectUri({
+      path: "(auth)/callback"
+    })
 
     const { error } = await supabase.auth.signInWithOtp({
       email: email,
@@ -75,7 +58,7 @@ export const AuthProvider = ({children}) => {
   }
 
   return (
-    <AuthContext.Provider value={{user, loading, createSessionFromUrl, sendMagicLink, signOut}}>
+    <AuthContext.Provider value={{user, loading, sendMagicLink, signOut}}>
       {children}
     </AuthContext.Provider>
   )

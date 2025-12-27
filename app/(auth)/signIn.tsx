@@ -1,4 +1,3 @@
-import * as Linking from "expo-linking";
 import { useContext, useState } from "react";
 import { Text, TextInput, TouchableOpacity, useColorScheme, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -8,10 +7,7 @@ export default function SignIn() {
   const [email, setEmail] = useState("")
   const [errorMessage, setErrorMessage] = useState("")
 
-  const {sendMagicLink, createSessionFromUrl} = useContext(AuthContext)
-
-  const url = Linking.useLinkingURL()
-  if (url) createSessionFromUrl(url);
+  const {sendMagicLink} = useContext(AuthContext)
 
   const colorScheme = useColorScheme()
   const placeholderColor = colorScheme === "dark" ? "hsl(188, 3%, 60%)" : "hsl(188, 3%, 20%)"
