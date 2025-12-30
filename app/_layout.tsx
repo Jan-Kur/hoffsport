@@ -1,13 +1,19 @@
-import { Stack } from "expo-router"
-import { useContext } from "react"
-import { AuthContext, AuthProvider } from "../contexts/authContext"
-import "../global.css"
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import { Stack } from "expo-router";
+import { useContext } from "react";
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { AuthContext, AuthProvider } from "../contexts/authContext";
+import "../global.css";
 
 export default function RootLayout() {
   return (
-    <AuthProvider>
-      <RootNavigator/>
-    </AuthProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <BottomSheetModalProvider>
+        <AuthProvider>
+          <RootNavigator/>
+        </AuthProvider>
+      </BottomSheetModalProvider>
+    </GestureHandlerRootView>
   )
 }
 

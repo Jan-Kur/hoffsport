@@ -33,13 +33,13 @@ export default function Schedule() {
   useEffect(() => {
     if (filteredMatches.length > 0) {
       if (selected === "past") {
-        requestAnimationFrame(() => {
+        setTimeout(() => {
           flashlistRef.current?.scrollToEnd({ animated: true });
-        })
+        }, 0)
       } else {
-        requestAnimationFrame(() => {
+        setTimeout(() => {
           flashlistRef.current?.scrollToOffset({ offset: 0, animated: true });
-        })
+        }, 0)
       }
     }
   }, [selected])
@@ -355,7 +355,7 @@ export default function Schedule() {
 
       <Filters selected={selected} setSelected={setSelected}/>
 
-      <View className="w-full flex-1 -mb-11">
+      <View className="w-full flex-1 -mb-10">
         <FlashList
           ref={flashlistRef}
           data={filteredMatches}
