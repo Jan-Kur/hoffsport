@@ -44,22 +44,20 @@ function TimeframeFilter({isSelected, onPress, text}: TimeframeFilterProps) {
 
 function AdvancedFilter() {  
   const colorScheme = useColorScheme()
-
   const bsRef = useRef<BottomSheetModal>(null)
+  const snapPoints = useMemo(() => ["60%", "90%"], [])
 
   const leagues = ["HBL", "HVL", "HLK"]
-  const [selectedLeague, setSelectedLeague] = useState(null)
-
-  const stages = ["Finał", "Półfinał", "Ćwierćfinał", "1/8 Finału", "Faza grupowa"]
-  const [selectedStage, setSelectedStage] = useState(null)
-
+  const stages = ["Finał", "Półfinał", "Ćwierćfinał", "1/8 Finału", "Faza grupowa"]//USEFUL
   const teams = ["Lebubu", "Ser Faraona", "Salchichias", "Mike i gang", "Prawdziwki", "Jelenia Góra", "Twoja stara", "Placka", "ŻKS Żentos", "Bratas", "a", "b", "c", "d", "e", "f", "g"]
+  
+  const { calendarActiveDateRanges, onCalendarDayPress, dateRange } = useDateRange()
+  const [selectedTeams, setSelectedTeams] = useState([])
+  const [selectedLeague, setSelectedLeague] = useState(null)
+  const [selectedStage, setSelectedStage] = useState(null)
 
   const [teamSearch, setTeamSearch] = useState("")
   const [showTeams, setShowTeams] = useState(false)
-  const [selectedTeams, setSelectedTeams] = useState([])
-
-  const { calendarActiveDateRanges, onCalendarDayPress, dateRange } = useDateRange()
   const [showCalendar, setShowCalendar] = useState(false)
 
   const filteredTeams = useMemo(() => 
@@ -68,8 +66,6 @@ function AdvancedFilter() {
     ), 
     [teamSearch, teams]
   )
-
-  const snapPoints = useMemo(() => ["60%", "90%"], [])
 
   return (
     <>
@@ -238,9 +234,6 @@ function formatDateId(startDate: string | undefined, endDate: string | undefined
   if (!startDate || !endDate) {
     return "Wybierz datę"
   }
-
-  const [startDay, startMonth, startYear] = startDate.split("-")
-  const [endDay, endMonth, endYear] = endDate.split("-")
 
   return `${new Date(startDate).toLocaleDateString('pl-PL')} - ${new Date(endDate).toLocaleDateString('pl-PL')}`
 }
