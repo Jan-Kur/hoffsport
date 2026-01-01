@@ -3,24 +3,26 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
 import { useDateRange } from '@marceloterreiro/flash-calendar';
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Modal, Text, TouchableOpacity, useColorScheme, View } from "react-native";
 import { FlatList, ScrollView, TextInput } from 'react-native-gesture-handler';
+import { supabase } from '../supabase';
+import { AdvancedFilters } from '../utils/matches';
 import { CustomSheet } from "./bottomSheet";
 import { CustomCalendar } from './calendar';
 
-export default function Filters({selected, setSelected}) {
+export default function Filters({filter, setFilter, advFilters, setAdvFilters}) {
   
   return (
     <View className='w-full h-fit flex-row justify-between'>
       
       <View className='flex-row gap-1'>
-        <TimeframeFilter isSelected={selected === "past"} onPress={() => setSelected("past")} text={"Przeszłe"}/>
-        <TimeframeFilter isSelected={selected === "today"} onPress={() => setSelected("today")} text={"Dzisiaj"}/>
-        <TimeframeFilter isSelected={selected === "upcoming"} onPress={() => setSelected("upcoming")} text={"Nadchodzące"}/>
+        <TimeframeFilter isSelected={filter === "past"} onPress={() => setFilter("past")} text={"Przeszłe"}/>
+        <TimeframeFilter isSelected={filter === "today"} onPress={() => setFilter("today")} text={"Dzisiaj"}/>
+        <TimeframeFilter isSelected={filter === "upcoming"} onPress={() => setFilter("upcoming")} text={"Nadchodzące"}/>
       </View>
 
-      <AdvancedFilter/>
+      <AdvancedFilter advFilters={advFilters} setAdvFilters={setAdvFilters}/>
 
     </View>
   )
@@ -42,19 +44,27 @@ function TimeframeFilter({isSelected, onPress, text}: TimeframeFilterProps) {
   )
 }
 
-function AdvancedFilter() {  
+function AdvancedFilter({advFilters, setAdvFilters}) {  
   const colorScheme = useColorScheme()
   const bsRef = useRef<BottomSheetModal>(null)
-  const snapPoints = useMemo(() => ["60%", "90%"], [])
+  const snapPoints = useMemo(() => ["60%", "95%"], [])
 
   const leagues = ["HBL", "HVL", "HLK"]
   const stages = ["Finał", "Półfinał", "Ćwierćfinał", "1/8 Finału", "Faza grupowa"]//USEFUL
-  const teams = ["Lebubu", "Ser Faraona", "Salchichias", "Mike i gang", "Prawdziwki", "Jelenia Góra", "Twoja stara", "Placka", "ŻKS Żentos", "Bratas", "a", "b", "c", "d", "e", "f", "g"]
+  
   
   const { calendarActiveDateRanges, onCalendarDayPress, dateRange } = useDateRange()
   const [selectedTeams, setSelectedTeams] = useState([])
   const [selectedLeague, setSelectedLeague] = useState(null)
   const [selectedStage, setSelectedStage] = useState(null)
+
+  const [teams, setTeams] = useState<{id: string, name: string}[]>([])
+
+  useEffect(() => {
+    fetchTeams().then(data => {
+      setTeams(data)
+    })
+  }, [])
 
   const [teamSearch, setTeamSearch] = useState("")
   const [showTeams, setShowTeams] = useState(false)
@@ -62,10 +72,35 @@ function AdvancedFilter() {
 
   const filteredTeams = useMemo(() => 
     teams.filter(team => 
-      team.toLowerCase().includes(teamSearch.toLowerCase())
+      team.name.toLowerCase().includes(teamSearch.toLowerCase())
     ), 
     [teamSearch, teams]
   )
+
+  const onSave = () => {
+    const filters: AdvancedFilters = {}
+    
+    if (dateRange.startId && dateRange.endId) {
+      filters.timeframe = {
+        start: dateRange.startId, 
+        end: dateRange.endId
+      }
+    }
+    
+    if (selectedTeams && selectedTeams.length > 0) {
+      filters.teams = selectedTeams
+    }
+    
+    if (selectedLeague) {
+      filters.league = selectedLeague
+    }
+    
+    if (selectedStage) {
+      filters.stage = selectedStage
+    }
+    
+    setAdvFilters(filters)
+  }
 
   return (
     <>
@@ -81,7 +116,7 @@ function AdvancedFilter() {
         ref={bsRef}
         snapPoints={snapPoints}
       >
-        <BottomSheetView className='flex-1 px-4 py-3 flex-col gap-5'>
+        <BottomSheetView className='flex-1 px-5 py-3 flex-col gap-5'>
 
           <View className='flex-col gap-2'>
             <Text className='text-base font-semibold text-dark dark:text-light'>Zakres czasowy</Text>
@@ -124,16 +159,17 @@ function AdvancedFilter() {
               <Text className='text-base font-semibold text-dark dark:text-light'>Drużyna</Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="handled">
                 <View className='flex-row gap-1'>
-                  {selectedTeams.map(team => {
+                  {selectedTeams.map(teamId => {
+                    const team = teams.find(t => t.id === teamId)
                     return (
                       <TouchableOpacity
-                      key={team}
+                      key={teamId}
                         onPress={() => {
-                          setSelectedTeams(selectedTeams.filter(t => t !== team))
+                          setSelectedTeams(selectedTeams.filter(t => t !== teamId))
                         }}
                         className='px-2 bg-main-light dark:bg-main rounded-full'
                       >
-                        <Text className='text-sm font-normal text-dark dark:text-light'>{team}</Text>
+                        <Text className='text-sm font-normal text-dark dark:text-light'>{team.name}</Text>
                       </TouchableOpacity>
                     )
                   })}
@@ -167,20 +203,20 @@ function AdvancedFilter() {
                   <TouchableOpacity 
                     onPress={() => {
                       setSelectedTeams(prev => 
-                        prev.includes(item) ? prev.filter(t => t !== item) : [...prev, item]
+                        prev.includes(item.id) ? prev.filter(t => t !== item.id) : [...prev, item.id]
                       )
                     }}
                     className='px-4 py-4'
                   >
-                    <Text className='text-dark dark:text-light text-base'>{item}</Text>
+                    <Text className='text-dark dark:text-light text-base'>{item.name}</Text>
                   </TouchableOpacity>
                 )}
                 ItemSeparatorComponent={() => <View className='h-[1px] bg-gray-3 dark:bg-gray-6'></View>}
                 ListEmptyComponent={() => <Text className='text-gray-3 dark:text-gray-6 text-center py-4 text-base font-medium'>Nie znaleziono drużyny</Text>}
-                keyExtractor={(item) => item}
+                keyExtractor={(item) => item.id}
                 showsVerticalScrollIndicator={false}
                 keyboardShouldPersistTaps="handled"
-                className='h-1/4'
+                className='h-1/5'
               />
             )}
           </View>
@@ -223,11 +259,33 @@ function AdvancedFilter() {
             </ScrollView>
           </View>
 
+          <TouchableOpacity 
+            onPress={onSave}
+            className='rounded-xl bg-main-light dark:bg-main py-2 mt-1'
+          >
+            <Text className='text-lg text-dark dark:text-light font-bold text-center'>Zapisz</Text>
+          </TouchableOpacity>
+
         </BottomSheetView>
       </CustomSheet>
     </>
     
   )
+}
+
+async function fetchTeams() {
+  try {
+    const {data, error} = await supabase
+      .from("teams")
+      .select("id, name")
+
+    if (error) throw error
+
+    return data
+  } catch (error) {
+    console.log(error)
+    return []
+  }
 }
 
 function formatDateId(startDate: string | undefined, endDate: string | undefined) {

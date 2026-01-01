@@ -27,7 +27,7 @@ export default function Schedule() {
         }, 0)
       }
     }
-  }, [filter])
+  }, [filter, advancedFilters])
 
   function DateHeader({date}: {date: Date}) {
     return (
@@ -52,7 +52,7 @@ export default function Schedule() {
   return (
     <SafeAreaView className="bg-light dark:bg-dark items-center flex-1 flex-col px-4 py-2 gap-4">
 
-      <Filters selected={filter} setSelected={setFilter}/>
+      <Filters filter={filter} setFilter={setFilter} advFilters={advancedFilters} setAdvFilters={setAdvancedFilters}/>
 
       <View className="w-full flex-1 -mb-10">
         <FlashList
@@ -92,25 +92,22 @@ const renderItem: ListRenderItem<Break> = ({item}) => {
         <Text
           numberOfLines={2}
           ellipsizeMode="tail" 
-          className={`${match.score1 > match.score2 ? "text-main-light" : "text-gray-8 dark:text-gray-1" } font-semibold text-[18px] text-left w-[37%]`}>{match.team1}</Text>
+          className={`${match.score1 > match.score2 ? "text-main-light" : "text-gray-8 dark:text-gray-1" } font-semibold text-[18px] text-left w-[37%]`}>{match.team1.name}</Text>
 
         <Text className="text-gray-8 dark:text-gray-1 text-[18px] font-semibold">{match.score1} - {match.score2}</Text>
 
         <Text 
           numberOfLines={2}
           ellipsizeMode="tail"
-          className={`${match.score2 > match.score1 ? "text-main-light" : "text-gray-8 dark:text-gray-1" } font-semibold text-[18px] text-right w-[37%]`}>{match.team2}</Text>
+          className={`${match.score2 > match.score1 ? "text-main-light" : "text-gray-8 dark:text-gray-1" } font-semibold text-[18px] text-right w-[37%]`}>{match.team2.name}</Text>
       </View>
     </View>
   ))
 
   return (
     <View className="p-3 gap-4 rounded-xl bg-gray-1 dark:bg-gray-8 flex-col items-start">
-
-    <Text className="text-lg text-dark dark:text-white font-bold">{formatTime(item.date)}</Text>
-      
-    {matches}
-      
+      <Text className="text-lg text-dark dark:text-white font-bold">{formatTime(item.date)}</Text>
+      {matches}
     </View>
   )
 }

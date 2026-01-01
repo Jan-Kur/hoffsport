@@ -1,7 +1,14 @@
 import { Database } from "../database.types"
 import { supabase } from "../supabase"
 
-export type Match = Database['public']['Tables']['matches']['Row']
+type team = {
+  name: string
+}
+
+export type Match = Omit<Database['public']['Tables']['matches']['Row'], "team1" | "team2"> & {
+  team1: team
+  team2: team
+}
 
 export type Break = {
   id: string
@@ -57,16 +64,16 @@ export async function fetchMatches(
 
     let query = supabase
       .from("matches")
-      .select()
+      .select('id,timestamp,score1,score2,stage,league,place,team1(name),team2(name)')
       .order("timestamp", {ascending: true})
       .limit(100)
 
     if (finalStart) query = query.gte("timestamp", finalStart)
     if (finalEnd) query = query.lte("timestamp", finalEnd)
 
-    if (advFilters.teams) {
-      const teamList = advFilters.teams.join(',')
-      query = query.or(`team1.in.(${teamList}),team2.in.(${teamList})`)
+    if (advFilters.teams && advFilters.teams.length > 0) {
+      const teams = advFilters.teams.join(",")
+      query = query.or(`team1.in.(${teams}),team2.in.(${teams})`)
     }
 
     if (advFilters.league) {
@@ -77,13 +84,13 @@ export async function fetchMatches(
       query = query.eq("stage", advFilters.stage)
     }
     
-    const {data, error} = await query
+    const {data, error} = await query.overrideTypes<Match[], { merge: false }>()
     
     if (error) throw error
 
     setMatches(groupMatchesByBreak(data))
   } catch (error) {
-    //TODO
+    console.log(error)//TODO
   }
 }
 
