@@ -98,8 +98,10 @@ function AdvancedFilter({advFilters, setAdvFilters}) {
     if (selectedStage) {
       filters.stage = selectedStage
     }
-    
-    setAdvFilters(filters)
+
+    if (advFilters !== filters) {
+      setAdvFilters(filters)
+    } 
   }
 
   return (
@@ -228,7 +230,7 @@ function AdvancedFilter({advFilters, setAdvFilters}) {
                 <TouchableOpacity
                   key={league}
                   onPress={() => setSelectedLeague(selectedLeague === league ? null : league)}
-                  className={`${selectedLeague === league ? "bg-main" : "bg-gray-2 dark:bg-gray-7"} 
+                  className={`${selectedLeague === league ? "bg-main-light dark:bg-main" : "bg-gray-2 dark:bg-gray-7"} 
                     flex-1 py-3 justify-center items-center rounded-xl`}
                 >
                   <Text className={`text-base font-semibold ${selectedLeague === league ? "text-light" : "text-dark dark:text-light"}`}>
@@ -247,7 +249,7 @@ function AdvancedFilter({advFilters, setAdvFilters}) {
                   <TouchableOpacity
                     key={stage}
                     onPress={() => setSelectedStage(selectedStage === stage ? null : stage)}
-                    className={`${selectedStage === stage ? "bg-main" : "bg-gray-2 dark:bg-gray-7"}
+                    className={`${selectedStage === stage ? "bg-main-light dark:bg-main" : "bg-gray-2 dark:bg-gray-7"}
                       px-4 py-3 justify-center items-center rounded-xl`}
                   >
                     <Text className={`text-base font-semibold ${selectedStage === stage ? "text-white" : "text-dark dark:text-light"}`}>
@@ -263,7 +265,7 @@ function AdvancedFilter({advFilters, setAdvFilters}) {
             onPress={onSave}
             className='rounded-xl bg-main-light dark:bg-main py-2 mt-1'
           >
-            <Text className='text-lg text-dark dark:text-light font-bold text-center'>Zapisz</Text>
+            <Text className='text-lg text-dark dark:text-light font-semibold text-center'>Zapisz</Text>
           </TouchableOpacity>
 
         </BottomSheetView>

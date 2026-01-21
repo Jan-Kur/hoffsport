@@ -6,14 +6,14 @@ import { supabase } from "../supabase";
 type AuthContextType = {
   user: User | null
   loading: boolean
-  sendMagicLink: (email: string) => Promise<{error: AuthError | null}>
+  sendMagicLink: (email: string, name: string, grade: string) => Promise<{error: AuthError | null}>
   signOut: () => Promise<{ error: AuthError }>
 }
 
 export const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: false,
-  sendMagicLink: async (_email: string) => ({ error: null}),
+  sendMagicLink: async (_email: string, _name: string, _grade: string) => ({ error: null}),
   signOut: async () => ({error: null}),
 })
 
@@ -36,7 +36,7 @@ export const AuthProvider = ({children}) => {
     }
   }, [])
 
-  const sendMagicLink = async (email: string) => {
+  const sendMagicLink = async (email: string, name: string, grade: string) => {
     const redirectTo = makeRedirectUri({
       path: "(auth)/callback"
     })
@@ -45,6 +45,7 @@ export const AuthProvider = ({children}) => {
       email: email,
       options: {
         emailRedirectTo: redirectTo,
+        data: {name, grade},
       },
     })
 
