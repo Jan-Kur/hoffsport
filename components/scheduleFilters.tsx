@@ -46,6 +46,7 @@ function TimeframeFilter({isSelected, onPress, text}: TimeframeFilterProps) {
 function AdvancedFilter({advFilters, setAdvFilters}) {  
   const colorScheme = useColorScheme()
   const bsRef = useRef<BottomSheetModal>(null)
+  const teamsInputRef = useRef<TextInput>(null)
   const snapPoints = useMemo(() => ["60%", "95%"], [])
 
   const leagues = ["HBL", "HVL", "HLK"]
@@ -119,6 +120,13 @@ function AdvancedFilter({advFilters, setAdvFilters}) {
       <CustomSheet
         ref={bsRef}
         snapPoints={snapPoints}
+        handleBackButton={() => {
+          if (showTeams) {
+            teamsInputRef.current.blur()
+          } else {
+            bsRef.current.close()
+          }
+        }}
       >
         <BottomSheetView className='flex-1 px-5 py-3 flex-col gap-5'>
 
@@ -183,7 +191,8 @@ function AdvancedFilter({advFilters, setAdvFilters}) {
             
             <View className='bg-gray-2 dark:bg-gray-7 px-4 flex-row rounded-xl items-center h-12 gap-2'>
               <MaterialIcons name="search" size={24} color={colorScheme === "dark" ? "#F2F3F3" : "#0B0E0E"} />
-              <TextInput 
+              <TextInput
+                ref={teamsInputRef} 
                 className='flex-1 text-base font-medium self-center text-dark dark:text-light'
                 autoCorrect={false}
                 selectionColor={colorScheme === "dark" ? "hsl(188, 90%, 20%)": "hsl(188, 90%, 30%)"}

@@ -16,17 +16,9 @@ export default function Schedule() {
   useEffect(() => {
     fetchMatches(filter, advancedFilters, setMatches)
 
-    if (matches.length > 0) {
-      if (filter === "past") {
-        setTimeout(() => {
-          flashlistRef.current?.scrollToEnd({ animated: true });
-        }, 0)
-      } else {
-        setTimeout(() => {
-          flashlistRef.current?.scrollToOffset({ offset: 0, animated: true });
-        }, 0)
-      }
-    }
+    setTimeout(() => {
+      flashlistRef.current.scrollToOffset({ offset: 0, animated: false })
+    }, 0)
   }, [filter, advancedFilters])
 
   function DateHeader({date}: {date: Date}) {
@@ -66,8 +58,7 @@ export default function Schedule() {
             if (matches.length === 0) return null
             return <DateHeader date={matches[0].date}/>
           }}
-          keyExtractor={item => item.id}
-          initialScrollIndex={filter === "past" ? matches.length - 1 : 0}
+          keyExtractor={item => item.id}  
         />
       </View>
       

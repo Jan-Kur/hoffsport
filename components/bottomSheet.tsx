@@ -1,33 +1,42 @@
 import { BottomSheetBackdrop, BottomSheetModal } from "@gorhom/bottom-sheet";
-import { forwardRef, useCallback, useRef } from "react";
+import { forwardRef, useCallback, useEffect, useRef } from "react";
 import { BackHandler, NativeEventSubscription, useColorScheme } from "react-native";
 
 type Props = {
   children: React.ReactNode
   snapPoints?: string[]
+  handleBackButton?: () => void
 }
 
 type Ref = BottomSheetModal
 
 export const CustomSheet = forwardRef<Ref, Props>((props, ref) => {
-  const { children, snapPoints = ["50%"] } = props
+  const { children, snapPoints = ["50%"], handleBackButton} = props
+  const colorScheme = useColorScheme()
+  const backHandler = useRef<NativeEventSubscription | null>(null)
+  const handleBackButtonRef = useRef(handleBackButton)
 
-  const colorScheme = useColorScheme();
+  useEffect(() => {
+    handleBackButtonRef.current = handleBackButton
+  }, [handleBackButton])
 
-  const backHandler = useRef<NativeEventSubscription | null>(null);
   const handleChange = (index: number) => {
     if (index >= 0 && !backHandler.current) {
       backHandler.current = BackHandler.addEventListener('hardwareBackPress', () => {
         if (typeof ref !== 'function' && ref?.current) {
-          ref.current.close();
+          if (handleBackButtonRef.current) {
+            handleBackButtonRef.current()
+          } else {
+            ref.current.close()
+          }
         }
-        return true;
+        return true
       }); 
     } else if (index < 0) {
-      backHandler.current?.remove();
-      backHandler.current = null;
+      backHandler.current?.remove()
+      backHandler.current = null
     }
-  };
+  }
 
   const renderBackdrop = useCallback(
 		(props) => (
