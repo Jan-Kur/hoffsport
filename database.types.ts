@@ -67,6 +67,7 @@ export type Database = {
       matches: {
         Row: {
           id: string
+          league_name: string
           place: string
           score_a: number
           score_b: number
@@ -77,6 +78,7 @@ export type Database = {
         }
         Insert: {
           id?: string
+          league_name: string
           place: string
           score_a?: number
           score_b?: number
@@ -87,6 +89,7 @@ export type Database = {
         }
         Update: {
           id?: string
+          league_name?: string
           place?: string
           score_a?: number
           score_b?: number
@@ -180,24 +183,24 @@ export type Database = {
           captain_user_id: string
           group_id: string | null
           id: string
-          stage_reached: string | null
-          status: string
+          name: string
+          stage_reached: string
           team_id: string
         }
         Insert: {
           captain_user_id: string
           group_id?: string | null
           id?: string
-          stage_reached?: string | null
-          status: string
+          name: string
+          stage_reached: string
           team_id: string
         }
         Update: {
           captain_user_id?: string
           group_id?: string | null
           id?: string
-          stage_reached?: string | null
-          status?: string
+          name?: string
+          stage_reached?: string
           team_id?: string
         }
         Relationships: [
@@ -231,7 +234,6 @@ export type Database = {
           id: string
           is_deleted: boolean
           league: string | null
-          name: string
         }
         Insert: {
           created_at?: string
@@ -239,7 +241,6 @@ export type Database = {
           id?: string
           is_deleted?: boolean
           league?: string | null
-          name: string
         }
         Update: {
           created_at?: string
@@ -247,7 +248,6 @@ export type Database = {
           id?: string
           is_deleted?: boolean
           league?: string | null
-          name?: string
         }
         Relationships: []
       }

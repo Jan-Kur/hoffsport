@@ -5,9 +5,9 @@ type team = {
   name: string
 }
 
-export type Match = Omit<Database['public']['Tables']['matches']['Row'], "team1" | "team2"> & {
-  team1: team
-  team2: team
+export type Match = Omit<Database['public']['Tables']['matches']['Row'], "team_season_a_id" | "team_season_b_id"> & {
+  team_season_a_id: team
+  team_season_b_id: team
 }
 
 export type Break = {
@@ -64,7 +64,17 @@ export async function fetchMatches(
 
     let query = supabase
       .from("matches")
-      .select('id,timestamp,score1,score2,stage,league,place,team1(name),team2(name)')
+      .select(`
+        id,
+        timestamp,
+        score_a,
+        score_b,
+        league_name,
+        stage,
+        place,
+        team_season_a_id(name),
+        team_season_b_id(name)
+      `)
       .order("timestamp", {ascending: true})
       .limit(100)
 
@@ -73,11 +83,11 @@ export async function fetchMatches(
 
     if (advFilters.teams && advFilters.teams.length > 0) {
       const teams = advFilters.teams.join(",")
-      query = query.or(`team1.in.(${teams}),team2.in.(${teams})`)
+      query = query.or(`team_season_a_id.in.(${teams}),team_season_b_id.in.(${teams})`)
     }
 
     if (advFilters.league) {
-      query = query.eq("league", advFilters.league)
+      query = query.eq("league_name", advFilters.league)
     }
 
     if (advFilters.stage) {
@@ -113,4 +123,27 @@ export function groupMatchesByBreak(matches: Match[]) : Break[] {
       matches
     }
   })
+}
+
+export async function fetchTeams() {
+  try {
+    const {data, error} = await supabase
+      .from("team_seasons")
+      .select("id, name")
+
+    if (error) throw error
+
+    return data
+  } catch (error) {
+    console.log(error)
+    return []
+  }
+}
+
+export function formatDateId(startDate: string | undefined, endDate: string | undefined) {
+  if (!startDate || !endDate) {
+    return "Wybierz datę"
+  }
+
+  return `${new Date(startDate).toLocaleDateString('pl-PL')} - ${new Date(endDate).toLocaleDateString('pl-PL')}`
 }

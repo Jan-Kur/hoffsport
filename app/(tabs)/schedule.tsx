@@ -92,14 +92,14 @@ const renderItem: ListRenderItem<Break> = ({item}) => {
         <Text
           numberOfLines={2}
           ellipsizeMode="tail" 
-          className={`${match.score1 > match.score2 ? "text-main-light" : "text-gray-8 dark:text-gray-1" } font-semibold text-[18px] text-left w-[37%]`}>{match.team1.name}</Text>
+          className={`${match.score_a > match.score_b ? "text-main-light" : "text-gray-8 dark:text-gray-1" } font-semibold text-[18px] text-left w-[37%]`}>{match.team_season_a_id.name}</Text>
 
-        <Text className="text-gray-8 dark:text-gray-1 text-[18px] font-semibold">{match.score1} - {match.score2}</Text>
+        <Text className="text-gray-8 dark:text-gray-1 text-[18px] font-semibold">{match.score_a} - {match.score_b}</Text>
 
         <Text 
           numberOfLines={2}
           ellipsizeMode="tail"
-          className={`${match.score2 > match.score1 ? "text-main-light" : "text-gray-8 dark:text-gray-1" } font-semibold text-[18px] text-right w-[37%]`}>{match.team2.name}</Text>
+          className={`${match.score_a > match.score_b ? "text-main-light" : "text-gray-8 dark:text-gray-1" } font-semibold text-[18px] text-right w-[37%]`}>{match.team_season_b_id.name}</Text>
       </View>
     </View>
   ))

@@ -6,8 +6,7 @@ import { useDateRange } from '@marceloterreiro/flash-calendar';
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Modal, Text, TouchableOpacity, useColorScheme, View } from "react-native";
 import { FlatList, ScrollView, TextInput } from 'react-native-gesture-handler';
-import { supabase } from '../supabase';
-import { AdvancedFilters } from '../utils/matches';
+import { AdvancedFilters, fetchTeams, formatDateId } from '../utils/matches';
 import { CustomSheet } from "./bottomSheet";
 import { CustomCalendar } from './calendar';
 
@@ -50,7 +49,7 @@ function AdvancedFilter({advFilters, setAdvFilters}) {
   const snapPoints = useMemo(() => ["60%", "95%"], [])
 
   const leagues = ["HBL", "HVL", "HLK"]
-  const stages = ["Finał", "Półfinał", "Ćwierćfinał", "1/8 Finału", "Faza grupowa"]//USEFUL
+  const stages = ["Finał", "Półfinał", "Ćwierćfinał", "1/8 Finału", "Faza grupowa"]
   
   
   const { calendarActiveDateRanges, onCalendarDayPress, dateRange } = useDateRange()
@@ -81,9 +80,12 @@ function AdvancedFilter({advFilters, setAdvFilters}) {
     const filters: AdvancedFilters = {}
     
     if (dateRange.startId && dateRange.endId) {
+      const endOfLastDay = new Date(dateRange.endId)
+      endOfLastDay.setDate(endOfLastDay.getDate() + 1)
+
       filters.timeframe = {
         start: dateRange.startId, 
-        end: dateRange.endId
+        end: endOfLastDay.toISOString(),
       }
     }
     
@@ -273,27 +275,4 @@ function AdvancedFilter({advFilters, setAdvFilters}) {
     </>
     
   )
-}
-
-async function fetchTeams() {
-  try {
-    const {data, error} = await supabase
-      .from("teams")
-      .select("id, name")
-
-    if (error) throw error
-
-    return data
-  } catch (error) {
-    console.log(error)
-    return []
-  }
-}
-
-function formatDateId(startDate: string | undefined, endDate: string | undefined) {
-  if (!startDate || !endDate) {
-    return "Wybierz datę"
-  }
-
-  return `${new Date(startDate).toLocaleDateString('pl-PL')} - ${new Date(endDate).toLocaleDateString('pl-PL')}`
 }
